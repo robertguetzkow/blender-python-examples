@@ -34,7 +34,7 @@ function to install and import the dependencies. If this step is successful the 
 ![image](./imgs/user-preferences-pre-install.png)
 
 The design that requires the user to manually press a button in the preferences, instead of automatically installing the packages, is intentional. The user should give explicit consent when files are
-downloaded from the internet and Python packages are installed on their system. [The Blender Foundation takes their users privacy and security serious](https://www.blender.org/about/license/), as an 
+downloaded from the internet and Python packages are installed on their system. [The Blender Foundation takes their user's privacy and security serious](https://www.blender.org/about/license/), as an 
 add-on developer you should as well.
 
 ### Preparing pip
