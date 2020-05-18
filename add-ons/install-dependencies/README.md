@@ -58,7 +58,9 @@ returned by [`globals()`](https://docs.python.org/3/library/functions.html#globa
 ## The user's perspective
 
 The user installs the add-on through the user preferences (*Edit > Preferences > Add-ons*). They might check the sidebar where they expect to find the add-on's operators, but find the panel with the installation instructions instead.
-Hence they go back to the preferences, open the details section of the add-on and press the button to install the dependencies. Once the install is completed the tab in the sidebar shows all operators as expected
+Hence they go back to the preferences, open the details section of the add-on and press the button to install the dependencies. Once the install is completed the tab in the sidebar shows all operators as expected.
+
+Failures during installation are reported to the user in a popup. In case the add-on is executed as a script instead of being installed as add-on, it will display the installation instructions in the sidebar as well.
 
 ## Additional Information
 
@@ -70,7 +72,7 @@ The add-on was originally developed as an answer to the [this question](https://
 
  **Compatible Blender versions:** 2.81 to 2.90
 
- **Commit hash:** 226ef43cf003511b6220e7135d4b6a8289729582
+ **Commit hash:** [226ef43cf003511b6220e7135d4b6a8289729582](https://github.com/robertguetzkow/blender-python-examples/commit/226ef43cf003511b6220e7135d4b6a8289729582)
 
  **Changes:**
  - Initial commit
