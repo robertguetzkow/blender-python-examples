@@ -1,4 +1,4 @@
-# Install dependencies - How to install Python packages with pip in Blender 
+# Install dependencies
 
 ## Description
 
@@ -40,7 +40,7 @@ add-on developer you should as well.
 ### Preparing pip
 
 The installation of packages with [`install_and_import_module()`](https://github.com/robertguetzkow/blender-python-examples/blob/226ef43cf003511b6220e7135d4b6a8289729582/add-ons/install-dependencies/install-dependencies.py#L63) requires pip. Only the Windows 
-release of Blender 2.81 includes pip, therefore it is necessary to install it through [`ensurepip.bootstrap()`](https://docs.python.org/3/library/ensurepip.html#ensurepip.bootstrap). During `ensurepip.bootstrap()` it 
+release of Blender 2.81 includes pip, therefore it is necessary to install it through [`ensurepip.bootstrap()`](https://docs.python.org/3/library/ensurepip.html#ensurepip.bootstrap). `ensurepip.bootstrap()` 
 [calls pip](https://github.com/python/cpython/blob/34b0598295284e3ff6cedf5c05e159ce1fa54d60/Lib/ensurepip/__init__.py#L35). During its execution pip sets the environment variable 
 [`PIP_REQ_TRACKER`](https://github.com/pypa/pip/blob/326efa5c710ecf19acc3e1315477251a4cd4bd13/src/pip/_internal/req/req_tracker.py#L54) which is used as a temporary directory. Unfortunately pip doesn't remove the environment variable and subsequent calls to pip 
 will attempt to use the path in `PIP_REQ_TRACKER` as temporary directory. However, this directory doesn't exist anymore and the pip would throw an exception. Therefore, `os.environ.pop("PIP_REQ_TRACKER", None)` is needed.
@@ -57,8 +57,8 @@ returned by [`globals()`](https://docs.python.org/3/library/functions.html#globa
 
 ## The user's perspective
 
-The user installs the add-on through the user preferences (*Edit > Preferences > Add-ons*). They might check the sidebar where they expect the find the add-on's operators, but find the panel with the installation instructions instead.
-Hence they go back to the preferences, open the detail section of the add-on and press the button to install the dependencies. Once the install is completed the tab in the sidebar shows all operators as expected.
+The user installs the add-on through the user preferences (*Edit > Preferences > Add-ons*). They might check the sidebar where they expect to find the add-on's operators, but find the panel with the installation instructions instead.
+Hence they go back to the preferences, open the details section of the add-on and press the button to install the dependencies. Once the install is completed the tab in the sidebar shows all operators as expected
 
 ## Additional Information
 
@@ -68,7 +68,9 @@ The add-on was originally developed as an answer to the [this question](https://
 ## Change log
 ### [1.0.0]() - 2020-05-18
 
- *Compatible Blender versions:* 2.81 to 2.90
- *Commit hash:* https://github.com/robertguetzkow/blender-python-examples/commit/226ef43cf003511b6220e7135d4b6a8289729582
- *Changes:*
+ **Compatible Blender versions:** 2.81 to 2.90
+
+ **Commit hash:** https://github.com/robertguetzkow/blender-python-examples/commit/226ef43cf003511b6220e7135d4b6a8289729582
+
+ **Changes:**
  - Initial commit
