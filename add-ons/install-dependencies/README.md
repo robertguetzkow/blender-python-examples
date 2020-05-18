@@ -70,7 +70,7 @@ The add-on was originally developed as an answer to the [this question](https://
 
  **Compatible Blender versions:** 2.81 to 2.90
 
- **Commit hash:** https://github.com/robertguetzkow/blender-python-examples/commit/226ef43cf003511b6220e7135d4b6a8289729582
+ **Commit hash:** 226ef43cf003511b6220e7135d4b6a8289729582
 
  **Changes:**
  - Initial commit
