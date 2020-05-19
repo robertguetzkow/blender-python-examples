@@ -2,8 +2,8 @@
 name: Bug report
 about: Report a bug in one of the example scripts or add-ons
 title: ''
-labels: ''
-assignees: ''
+labels: 'bug'
+assignees: 'robertguetzkow'
 
 ---
 

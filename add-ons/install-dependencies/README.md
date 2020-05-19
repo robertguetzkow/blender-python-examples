@@ -67,12 +67,12 @@ Failures during installation are reported to the user in a popup. In case the ad
 
 ## Improvement suggestions for your own add-on
 
-- Show a more descriptive error message when a "permission denied" error occurs during the installation of packages. Inform the user that Blender has to be started with elevated privileges once for the installation of the dependencies.
+- Show a more descriptive error message when a "permission denied" error occurs during the installation of packages. Inform the user that elevated permission are necessary and provide instructions to resolve the issue. Ideally Blender shouldn't be started with
+ elevated permissions, since this would be against security best practice. Therefore, you could provide instructions to install the packages manually and include a `requirements.txt`.
 
 ## Additional Information
 
 The add-on was originally developed as an answer to the [this question](https://blender.stackexchange.com/questions/168448/bundling-python-library-with-addon) on Blender's StackExchange.
-
 
 ## Change log
 
