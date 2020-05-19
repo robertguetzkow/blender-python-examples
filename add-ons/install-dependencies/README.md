@@ -76,7 +76,7 @@ The add-on was originally developed as an answer to the [this question](https://
 
 ## Change log
 
-### 1.0.1 - 2020-05-18
+### 1.0.1 - 2020-05-19
 
  **Compatible Blender versions:** 2.81 to 2.90
 
