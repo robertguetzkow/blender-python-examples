@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains a collections of scripts and add-ons that demonstrate how to solve certain problems in Blender. The content is aimed at developers that need a little help, reference or inspiration for their own implementation.
+This repository contains a collection of scripts and add-ons that demonstrate how to solve certain problems in Blender. The content is aimed at developers that need a little help, reference or inspiration for their own implementation.
 Generally, the add-ons are *not* intended for Blender users, since they demonstrate a specific functionality that isn't useful on its own.
 
 ## License
