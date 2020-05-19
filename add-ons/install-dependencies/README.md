@@ -62,6 +62,11 @@ Hence they go back to the preferences, open the details section of the add-on an
 
 Failures during installation are reported to the user in a popup. In case the add-on is executed as a script, instead of being installed as add-on, it will display the installation instructions in the sidebar as well.
 
+## Improvement suggestions for your own add-on
+
+- Currently `install_and_import_module()` also contains the installation of pip through `ensurepip.bootstrap()`. Repeating this step when installing multiple packages is unnecessary and could be moved to a separate function.
+- Show a more descriptive error message when a "permission denied" error occurs during the installation of packages. Inform the user that Blender has to be started with elevated privileges once for the installation of the dependencies.
+
 ## Additional Information
 
 The add-on was originally developed as an answer to the [this question](https://blender.stackexchange.com/questions/168448/bundling-python-library-with-addon) on Blender's StackExchange.
