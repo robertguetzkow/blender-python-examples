@@ -17,7 +17,7 @@
 bl_info = {
     "name": "Install Dependencies Example",
     "author": "Robert Guetzkow",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (2, 81, 0),
     "location": "View3D > Sidebar > Example Tab",
     "description": "Example add-on that installs a Python package",
@@ -60,6 +60,23 @@ def import_module(module_name, global_name=None):
     globals()[global_name] = importlib.import_module(module_name)
 
 
+def install_pip():
+    """
+    Installs pip if not already present. Please note that ensurepip.bootstrap() also calls pip, which adds the
+    environment variable PIP_REQ_TRACKER. After ensurepip.bootstrap() finishes execution, the directory doesn't exist
+    anymore. However, when subprocess is used to call pip, in order to install a package, the environment variables
+    still contain PIP_REQ_TRACKER with the now nonexistent path. This is a problem since pip checks if PIP_REQ_TRACKER
+    is set and if it is, attempts to use it as temp directory. This would result in an error because the
+    directory can't be found. Therefore, PIP_REQ_TRACKER needs to be removed from environment variables.
+    :return:
+    """
+    import os
+    import ensurepip
+
+    ensurepip.bootstrap()
+    os.environ.pop("PIP_REQ_TRACKER", None)
+
+
 def install_and_import_module(module_name, package_name=None, global_name=None):
     """
     Installs the package through pip and attempts to import the installed module.
@@ -71,25 +88,13 @@ def install_and_import_module(module_name, package_name=None, global_name=None):
        the global_name under which the module can be accessed.
     :raises: subprocess.CalledProcessError and ImportError
     """
-    import os
     import importlib
-    import ensurepip
 
     if package_name is None:
         package_name = module_name
 
     if global_name is None:
         global_name = module_name
-
-    # ensurepip.bootstrap() also calls pip, which adds the environment variable PIP_REQ_TRACKER. After
-    # ensurepip.bootstrap() finishes execution, the directory doesn't exist anymore. However, when subprocess
-    # is used to call pip, in order to install a package, the environment variables still contain
-    # PIP_REQ_TRACKER with the now nonexistent path. This is a problem since pip checks if PIP_REQ_TRACKER is
-    # set and if it is, attempts to use it as temp directory. This would result in an error because the
-    # directory couldn't be found. Therefore, PIP_REQ_TRACKER needs to be removed from os.environ.
-
-    ensurepip.bootstrap()
-    os.environ.pop("PIP_REQ_TRACKER", None)
 
     # Try to install the package. This may fail with subprocess.CalledProcessError
     subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True)
@@ -177,6 +182,7 @@ class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
 
     def execute(self, context):
         try:
+            install_pip()
             for dependency in dependencies:
                 install_and_import_module(module_name=dependency.module,
                                           package_name=dependency.package,
