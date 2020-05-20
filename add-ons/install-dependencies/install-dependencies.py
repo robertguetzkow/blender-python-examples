@@ -70,11 +70,16 @@ def install_pip():
     directory can't be found. Therefore, PIP_REQ_TRACKER needs to be removed from environment variables.
     :return:
     """
-    import os
-    import ensurepip
 
-    ensurepip.bootstrap()
-    os.environ.pop("PIP_REQ_TRACKER", None)
+    try:
+        # Check if pip is already installed
+        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "--version"], check=True)
+    except subprocess.CalledProcessError:
+        import os
+        import ensurepip
+
+        ensurepip.bootstrap()
+        os.environ.pop("PIP_REQ_TRACKER", None)
 
 
 def install_and_import_module(module_name, package_name=None, global_name=None):
