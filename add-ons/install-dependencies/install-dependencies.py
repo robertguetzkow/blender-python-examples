@@ -188,7 +188,7 @@ class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
                                           package_name=dependency.package,
                                           global_name=dependency.name)
         except (subprocess.CalledProcessError, ImportError) as err:
-            self.report({"ERROR"}, err)
+            self.report({"ERROR"}, str(err))
             return {"CANCELLED"}
 
         global dependencies_installed
