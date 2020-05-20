@@ -17,7 +17,7 @@
 bl_info = {
     "name": "Install Dependencies Example",
     "author": "Robert Guetzkow",
-    "version": (1, 0, 1),
+    "version": (1, 0, 2),
     "blender": (2, 81, 0),
     "location": "View3D > Sidebar > Example Tab",
     "description": "Example add-on that installs a Python package",
