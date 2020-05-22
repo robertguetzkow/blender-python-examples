@@ -42,8 +42,8 @@ add-on developer you should as well.
 
 ### Preparing pip
 
-The installation of packages requires pip. Only the Windows release of Blender 2.81 includes pip, therefore it is necessary to install it through [`ensurepip.bootstrap()`](https://docs.python.org/3/library/ensurepip.html#ensurepip.bootstrap) which is done in 
-[`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L63). `ensurepip.bootstrap()` 
+The installation of packages requires pip. Only the Windows release of Blender includes pip, therefore it is necessary to install it through [`ensurepip.bootstrap()`](https://docs.python.org/3/library/ensurepip.html#ensurepip.bootstrap) for all other operating systems
+which is done in [`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L63). `ensurepip.bootstrap()` 
 [calls pip](https://github.com/python/cpython/blob/34b0598295284e3ff6cedf5c05e159ce1fa54d60/Lib/ensurepip/__init__.py#L35). During its execution pip sets the environment variable 
 [`PIP_REQ_TRACKER`](https://github.com/pypa/pip/blob/326efa5c710ecf19acc3e1315477251a4cd4bd13/src/pip/_internal/req/req_tracker.py#L54) which is used as a temporary directory. Unfortunately pip doesn't remove the environment variable and subsequent calls to pip 
 will attempt to use the path in `PIP_REQ_TRACKER` as temporary directory. However, this directory doesn't exist anymore and the pip would throw an exception. Therefore, `os.environ.pop("PIP_REQ_TRACKER", None)` is needed.
@@ -83,7 +83,7 @@ The add-on was originally developed as an answer to the [this question](https://
  **Commit hash:** [cd3597939d77e37bb45434533440d56262f01a55](https://github.com/robertguetzkow/blender-python-examples/commit/cd3597939d77e37bb45434533440d56262f01a55)
 
  **Changes:**
- - Fix `install_pip` for when the ensurepip modules is not available but pip is already installed
+ - Fix `install_pip` for when the ensurepip module is not available but pip is already installed
 
 ### 1.0.1 - 2020-05-19
 
