@@ -50,10 +50,10 @@ will attempt to use the path in `PIP_REQ_TRACKER` as temporary directory. Howeve
 
 ### Installing the package
 
-Blender excludes the user site-packages from its `sys.path` by default and is therefore not able to import these packages. [This is done to prevent the accidental loading of packages installed by the system's Python which may be incompatible to Blender's Python version.](https://developer.blender.org/rB79a58eef059ffc3f12d11bd68938cfb1b4cd2462).
+Blender excludes the user site-packages from its `sys.path` by default and is therefore not able to import these packages. [This is done to prevent the accidental loading of packages installed by the system's Python which may be incompatible to Blender's Python version.](https://developer.blender.org/rB79a58eef059ffc3f12d11bd68938cfb1b4cd2462)
 However, by default pip would still check the user site-packages when it tries to determine if the requirements are already satisfied. That would be incorrect for Blender, since it needs them to be installed for its own Python interpreter.
 Therefore, [`PYTHONNOUSERSITE`](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONNOUSERSITE) is temporarily set to prevent pip from checking the user site-packages when trying to determine if the packages are already 
-installed. Next the package(s) can be installed for Blender. The package installation is accomplished by [calling pip through `subprocess`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L114). The path to the 
+installed. The package installation is accomplished by [calling pip through `subprocess`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L114). The path to the 
 Python binary is given by [`bpy.app.binary_path_python`](https://docs.blender.org/api/current/bpy.app.html#bpy.app.binary_path_python). Once the installation has been attempted, the `PYTHONNOUSERSITE` environment variable is removed.
 
 ### Importing the module
