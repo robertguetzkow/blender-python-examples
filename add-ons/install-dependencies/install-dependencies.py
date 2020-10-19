@@ -17,7 +17,7 @@
 bl_info = {
     "name": "Install Dependencies Example",
     "author": "Robert Guetzkow",
-    "version": (1, 0, 2),
+    "version": (1, 0, 3),
     "blender": (2, 81, 0),
     "location": "View3D > Sidebar > Example Tab",
     "description": "Example add-on that installs a Python package",
@@ -28,7 +28,9 @@ bl_info = {
     "category": "3D View"}
 
 import bpy
+import os
 import subprocess
+import importlib
 from collections import namedtuple
 
 Dependency = namedtuple("Dependency", ["module", "package", "name"])
@@ -50,8 +52,6 @@ def import_module(module_name, global_name=None):
        the global_name under which the module can be accessed.
     :raises: ImportError and ModuleNotFoundError
     """
-    import importlib
-
     if global_name is None:
         global_name = module_name
 
@@ -75,7 +75,6 @@ def install_pip():
         # Check if pip is already installed
         subprocess.run([bpy.app.binary_path_python, "-m", "pip", "--version"], check=True)
     except subprocess.CalledProcessError:
-        import os
         import ensurepip
 
         ensurepip.bootstrap()
@@ -93,16 +92,30 @@ def install_and_import_module(module_name, package_name=None, global_name=None):
        the global_name under which the module can be accessed.
     :raises: subprocess.CalledProcessError and ImportError
     """
-    import importlib
-
     if package_name is None:
         package_name = module_name
 
     if global_name is None:
         global_name = module_name
 
-    # Try to install the package. This may fail with subprocess.CalledProcessError
-    subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True)
+    # Blender disables the loading of user site-packages by default. However, pip will still check them to determine
+    # if a dependency is already installed. This can cause problems if the packages is installed in the user
+    # site-packages and pip deems the requirement satisfied, but Blender cannot import the package from the user
+    # site-packages. Hence, the environment variable PYTHONNOUSERSITE is set to disallow pip from checking the user
+    # site-packages. If the package is not already installed for Blender's Python interpreter, it will then try to.
+    # The paths used by pip can be checked with `subprocess.run([bpy.app.binary_path_python, "-m", "site"], check=True)`
+
+    # Store the original environment variables
+    environ_orig = dict(os.environ)
+    os.environ["PYTHONNOUSERSITE"] = "1"
+
+    try:
+        # Try to install the package. This may fail with subprocess.CalledProcessError
+        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True)
+    finally:
+        # Always restore the original environment variables
+        os.environ.clear()
+        os.environ.update(environ_orig)
 
     # The installation succeeded, attempt to import the module again
     import_module(module_name, global_name)
