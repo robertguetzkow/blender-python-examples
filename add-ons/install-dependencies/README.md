@@ -9,29 +9,29 @@ This add-on demonstrates how to install Python packages from within Blender. Ele
 ### Dependencies
 
 The required dependencies are declared at the beginning the form a tuple of `namedtuple` and the installation state of the dependencies is stored as boolean in 
-[`dependencies_installed`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L41).
+[`dependencies_installed`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L41).
 
 ### Registration
 
-The [registration](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L222) is split into three steps:
+The [registration](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L235) is split into three steps:
 
 1. Register the classes related to the add-on's preferences and a panel with installation instructions.
 2. Check if the required dependencies are installed and try to import them. Only proceed to 3.) if the modules can be found and set `dependencies_installed` to true.
 3. Register all other classes, e.g. panels, operators, etc.
 
-The user will see a panel with installation instructions ([`EXAMPLE_PT_warning_panel`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L144)) 
+The user will see a panel with installation instructions ([`EXAMPLE_PT_warning_panel`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L157)) 
 in place of the actual operators should step 2.) fail. In case it is successful, `EXAMPLE_PT_warning_panel` won't be displayed. This is because the 
-[`poll`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L151) method checks `dependencies_installed`.
+[`poll`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L164) method checks `dependencies_installed`.
 
 ![image](./imgs/install-instructions.png)
 
 ### Add-on's preferences
 
-The add-on's preferences are implemented by [`EXAMPLE_preferences`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L209), which display the 
-operator [`EXAMPLE_OT_install_dependencies`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L175). This creates a button in the details section 
+The add-on's preferences are implemented by [`EXAMPLE_preferences`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L222), which display the 
+operator [`EXAMPLE_OT_install_dependencies`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L188). This creates a button in the details section 
 of the add-on's preferences that allows the user to install the required Python packages. It calls the 
-[`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L63) function to install pip and
-[`install_and_import_module()`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L85) function to install and import the dependencies. If this step is 
+[`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L63) function to install pip and
+[`install_and_import_module()`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L84) function to install and import the dependencies. If this step is 
 successful the `dependencies_installed` is set to true and the remaining panels, operators, etc. are registered as well.
 
 ![image](./imgs/user-preferences-pre-install.png)
@@ -43,15 +43,18 @@ add-on developer you should as well.
 ### Preparing pip
 
 The installation of packages requires pip. Only the Windows release of Blender includes pip, therefore it is necessary to install it through [`ensurepip.bootstrap()`](https://docs.python.org/3/library/ensurepip.html#ensurepip.bootstrap) for all other operating systems
-which is done in [`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L63). `ensurepip.bootstrap()` 
+which is done in [`install_pip`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L63). `ensurepip.bootstrap()` 
 [calls pip](https://github.com/python/cpython/blob/34b0598295284e3ff6cedf5c05e159ce1fa54d60/Lib/ensurepip/__init__.py#L35). During its execution pip sets the environment variable 
 [`PIP_REQ_TRACKER`](https://github.com/pypa/pip/blob/326efa5c710ecf19acc3e1315477251a4cd4bd13/src/pip/_internal/req/req_tracker.py#L54) which is used as a temporary directory. Unfortunately pip doesn't remove the environment variable and subsequent calls to pip 
 will attempt to use the path in `PIP_REQ_TRACKER` as temporary directory. However, this directory doesn't exist anymore and the pip would throw an exception. Therefore, `os.environ.pop("PIP_REQ_TRACKER", None)` is needed.
 
 ### Installing the package
 
-The package installation is accomplished by [calling pip through `subprocess`](https://github.com/robertguetzkow/blender-python-examples/blob/cd3597939d77e37bb45434533440d56262f01a55/add-ons/install-dependencies/install-dependencies.py#L105). The path to the 
-Python binary is given by [`bpy.app.binary_path_python`](https://docs.blender.org/api/current/bpy.app.html#bpy.app.binary_path_python).
+Blender excludes the user site-packages from its `sys.path` by default and is therefore not able to import these packages. [This is done to prevent the accidental loading of packages installed by the system's Python which may be incompatible to Blender's Python version.](https://developer.blender.org/rB79a58eef059ffc3f12d11bd68938cfb1b4cd2462).
+However, by default pip would still check the user site-packages when it tries to determine if the requirements are already satisfied. That would be incorrect for Blender, since it needs them to be installed for its own Python interpreter.
+Therefore, [`PYTHONNOUSERSITE`](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONNOUSERSITE) is temporarily set to prevent pip from checking the user site-packages when trying to determine if the packages are already 
+installed. Next the package(s) can be installed for Blender. The package installation is accomplished by [calling pip through `subprocess`](https://github.com/robertguetzkow/blender-python-examples/blob/8bf7ddefb458e697d51ca5bd74185890146d4e9d/add-ons/install-dependencies/install-dependencies.py#L114). The path to the 
+Python binary is given by [`bpy.app.binary_path_python`](https://docs.blender.org/api/current/bpy.app.html#bpy.app.binary_path_python). Once the installation has been attempted, the `PYTHONNOUSERSITE` environment variable is removed.
 
 ### Importing the module
 
@@ -75,6 +78,15 @@ Failures during installation are reported to the user in a popup. In case the ad
 The add-on was originally developed as an answer to the [this question](https://blender.stackexchange.com/questions/168448/bundling-python-library-with-addon) on Blender's StackExchange.
 
 ## Change log
+
+### 1.0.3 - 2020-10-19
+
+ **Compatible Blender versions:** 2.81 to 2.90
+
+ **Commit hash:** [8bf7ddefb458e697d51ca5bd74185890146d4e9d](https://github.com/robertguetzkow/blender-python-examples/commit/8bf7ddefb458e697d51ca5bd74185890146d4e9d)
+
+ **Changes:**
+ - Prevent pip from checking the user site-packages to determine if requirements are satisfied. Blender cannot import packages from user site-packages by default, as this has been intentionally disabled by commit [rB79a58eef059ffc3f12d11bd68938cfb1b4cd2462](https://developer.blender.org/rB79a58eef059ffc3f12d11bd68938cfb1b4cd2462).
 
 ### 1.0.2 - 2020-05-20
 
