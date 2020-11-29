@@ -29,6 +29,7 @@ bl_info = {
 
 import bpy
 import os
+import sys
 import subprocess
 import importlib
 from collections import namedtuple
@@ -42,22 +43,30 @@ dependencies = (Dependency(module="matplotlib", package=None, name=None),)
 
 dependencies_installed = False
 
-
-def import_module(module_name, global_name=None):
+def import_module(module_name, global_name=None,do_reload=False):
     """
     Import a module.
     :param module_name: Module to import.
     :param global_name: (Optional) Name under which the module is imported. If None the module_name will be used.
        This allows to import under a different name with the same effect as e.g. "import numpy as np" where "np" is
        the global_name under which the module can be accessed.
+    :param do_reload: If True, reloads the module (if it was found buffered).
+    : return : True if the module was already loaded in memory.
     :raises: ImportError and ModuleNotFoundError
     """
     if global_name is None:
         global_name = module_name
 
+    # checks if this module is already registered as loaded:
+    is_already_loaded = (module_name in sys.modules)
     # Attempt to import the module and assign it to globals dictionary. This allow to access the module under
     # the given name, just like the regular import would.
     globals()[global_name] = importlib.import_module(module_name)
+
+    if is_already_loaded and do_reload :
+        importlib.reload(globals()[global_name])
+
+    return is_already_loaded
 
 
 def install_pip():
@@ -80,6 +89,29 @@ def install_pip():
         ensurepip.bootstrap()
         os.environ.pop("PIP_REQ_TRACKER", None)
 
+def uninstall_module(module_name, package_name=None):
+    """
+    Uninstalls the package through pip
+    :param module_name: Module to remove.
+    :param package_name: (Optional) Name of the package that needs to be removed. If None it is assumed to be equal
+       to the module_name.
+    :raises: subprocess.CalledProcessError and ImportError
+    """
+
+    if package_name is None:
+        package_name = module_name
+
+    # Store the original environment variables
+    environ_orig = dict(os.environ)
+    os.environ["PYTHONNOUSERSITE"] = "1"
+
+    try:
+        # Try to uninstall the package. This may fail with subprocess.CalledProcessError
+        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "uninstall", "-y", package_name], check=True)
+    finally:
+        # Always restore the original environment variables
+        os.environ.clear()
+        os.environ.update(environ_orig)
 
 def install_and_import_module(module_name, package_name=None, global_name=None):
     """
@@ -184,6 +216,40 @@ class EXAMPLE_PT_warning_panel(bpy.types.Panel):
         for line in lines:
             layout.label(text=line)
 
+class EXAMPLE_OT_uninstall_dependencies(bpy.types.Operator):
+    """WARNING, THIS UNINSTALLS COMPONENTS WITHOUT RESPECTING OTHER ADDONS."""
+    bl_idname = "example.uninstall_dependencies"
+    bl_label = "Uninstall dependencies"
+    bl_description = ("WARNING, this is not recommended, unless you know what you are doing!" 
+                      "Uninstalls the required python packages for this add-on, whether the addon installed them or not"
+                      "Blender may have to be started with elevated permissions")
+    bl_options = {"REGISTER", "INTERNAL"}
+    
+    @classmethod
+    def poll(cls, context):
+        # Deactivate when dependencies have been installed
+        return dependencies_installed
+
+    def execute(self, context):
+        global dependencies_installed
+        ret_code = {"FINISHED"}
+        try:
+            install_pip()
+            for dependency in dependencies:
+                #dependencies = (Dependency(module="matplotlib", package=None, name=None),)
+                uninstall_module(module_name=dependency.module, package_name=dependency.package)
+                dependencies_installed = False # Changing global flag
+        except (subprocess.CalledProcessError, ImportError) as err:
+            self.report({"ERROR"}, str(err))
+            ret_code = {"CANCELLED"}
+        finally :
+            if not dependencies_installed:
+                # un-Register the panels, operators, etc. since at least one dependency was un-installed
+                for cls in classes:
+                    bpy.utils.unregister_class(cls)
+            return ret_code
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
 
 class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
     bl_idname = "example.install_dependencies"
@@ -218,19 +284,18 @@ class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
 
         return {"FINISHED"}
 
-
 class EXAMPLE_preferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
     def draw(self, context):
         layout = self.layout
         layout.operator(EXAMPLE_OT_install_dependencies.bl_idname, icon="CONSOLE")
-
+        layout.operator(EXAMPLE_OT_uninstall_dependencies.bl_idname, icon="CONSOLE")
 
 preference_classes = (EXAMPLE_PT_warning_panel,
                       EXAMPLE_OT_install_dependencies,
+                      EXAMPLE_OT_uninstall_dependencies,
                       EXAMPLE_preferences)
-
 
 def register():
     global dependencies_installed
@@ -241,7 +306,7 @@ def register():
 
     try:
         for dependency in dependencies:
-            import_module(module_name=dependency.module, global_name=dependency.name)
+            import_module(module_name=dependency.module, global_name=dependency.name, do_reload=True)
         dependencies_installed = True
     except ModuleNotFoundError:
         # Don't register other panels, operators etc.
@@ -258,7 +323,6 @@ def unregister():
     if dependencies_installed:
         for cls in classes:
             bpy.utils.unregister_class(cls)
-
 
 if __name__ == "__main__":
     register()
