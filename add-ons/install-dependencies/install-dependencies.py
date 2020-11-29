@@ -29,6 +29,7 @@ bl_info = {
 
 import bpy
 import os
+import sys
 import subprocess
 import importlib
 from collections import namedtuple
@@ -38,26 +39,34 @@ Dependency = namedtuple("Dependency", ["module", "package", "name"])
 # Declare all modules that this add-on depends on. The package and (global) name can be set to None,
 # if they are equal to the module name. See import_module and ensure_and_import_module for the
 # explanation of the arguments.
-dependencies = (Dependency(module="matplotlib", package=None, name=None),)
+dependencies = (Dependency(module="vectormath", package=None, name='vmath'),)
 
 dependencies_installed = False
 
-
-def import_module(module_name, global_name=None):
+def import_module(module_name, global_name=None,do_reload=False):
     """
     Import a module.
     :param module_name: Module to import.
     :param global_name: (Optional) Name under which the module is imported. If None the module_name will be used.
        This allows to import under a different name with the same effect as e.g. "import numpy as np" where "np" is
        the global_name under which the module can be accessed.
+    :param do_reload: If True, reloads the module (if it was found buffered).
+    : return : True if the module was already loaded in memory.
     :raises: ImportError and ModuleNotFoundError
     """
     if global_name is None:
         global_name = module_name
 
+    # checks if this module is already registered as loaded:
+    is_already_loaded = (module_name in sys.modules)
     # Attempt to import the module and assign it to globals dictionary. This allow to access the module under
     # the given name, just like the regular import would.
     globals()[global_name] = importlib.import_module(module_name)
+
+    if is_already_loaded and do_reload :
+        importlib.reload(globals()[global_name])
+
+    return is_already_loaded
 
 
 def install_pip():
@@ -79,7 +88,6 @@ def install_pip():
 
         ensurepip.bootstrap()
         os.environ.pop("PIP_REQ_TRACKER", None)
-
 
 def install_and_import_module(module_name, package_name=None, global_name=None):
     """
@@ -120,17 +128,20 @@ def install_and_import_module(module_name, package_name=None, global_name=None):
     # The installation succeeded, attempt to import the module again
     import_module(module_name, global_name)
 
-
 class EXAMPLE_OT_dummy_operator(bpy.types.Operator):
     bl_idname = "example.dummy_operator"
     bl_label = "Dummy Operator"
-    bl_description = "This operator tries to use matplotlib."
+    bl_description = "This operator tries to use module vectormath."
     bl_options = {"REGISTER"}
 
     def execute(self, context):
-        print(matplotlib.get_backend())
+        Vector2 = vmath.Vector2Array
+        Vector3 = vmath.Vector3Array
+        v1 = Vector2(11,10)
+        v2 = Vector2(10,11)
+        v3 = v1 - v2
+        print(v3.length)  # correct answer should be sqrt(2) approx 1.4
         return {"FINISHED"}
-
 
 class EXAMPLE_PT_panel(bpy.types.Panel):
     bl_label = "Example Panel"
@@ -142,17 +153,17 @@ class EXAMPLE_PT_panel(bpy.types.Panel):
         layout = self.layout
 
         for dependency in dependencies:
-            if dependency.name is None:
+            if dependency.name is None and hasattr(globals()[dependency.module], "__version__"):
                 layout.label(text=f"{dependency.module} {globals()[dependency.module].__version__}")
-            else:
+            elif hasattr(globals()[dependency.name], "__version__"):
                 layout.label(text=f"{dependency.module} {globals()[dependency.name].__version__}")
+            else :
+                layout.label(text=f"{dependency.module} Version N/A")
 
         layout.operator(EXAMPLE_OT_dummy_operator.bl_idname)
 
-
 classes = (EXAMPLE_OT_dummy_operator,
            EXAMPLE_PT_panel)
-
 
 class EXAMPLE_PT_warning_panel(bpy.types.Panel):
     bl_label = "Example Warning"
@@ -183,7 +194,6 @@ class EXAMPLE_PT_warning_panel(bpy.types.Panel):
 
         for line in lines:
             layout.label(text=line)
-
 
 class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
     bl_idname = "example.install_dependencies"
@@ -218,7 +228,6 @@ class EXAMPLE_OT_install_dependencies(bpy.types.Operator):
 
         return {"FINISHED"}
 
-
 class EXAMPLE_preferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
@@ -226,11 +235,9 @@ class EXAMPLE_preferences(bpy.types.AddonPreferences):
         layout = self.layout
         layout.operator(EXAMPLE_OT_install_dependencies.bl_idname, icon="CONSOLE")
 
-
 preference_classes = (EXAMPLE_PT_warning_panel,
                       EXAMPLE_OT_install_dependencies,
                       EXAMPLE_preferences)
-
 
 def register():
     global dependencies_installed
@@ -241,7 +248,7 @@ def register():
 
     try:
         for dependency in dependencies:
-            import_module(module_name=dependency.module, global_name=dependency.name)
+            import_module(module_name=dependency.module, global_name=dependency.name, do_reload=True)
         dependencies_installed = True
     except ModuleNotFoundError:
         # Don't register other panels, operators etc.
@@ -258,7 +265,6 @@ def unregister():
     if dependencies_installed:
         for cls in classes:
             bpy.utils.unregister_class(cls)
-
 
 if __name__ == "__main__":
     register()
