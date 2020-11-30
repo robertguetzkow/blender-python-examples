@@ -56,7 +56,7 @@ However, by default pip would still check the user site-packages when it tries t
 Therefore, [`PYTHONNOUSERSITE`](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONNOUSERSITE) is temporarily set to prevent pip from checking the user site-packages when trying to determine if the packages are already 
 installed. The package installation is accomplished by [calling pip through `subprocess`](https://github.com/robertguetzkow/blender-python-examples/blob/4a3c99a843305b91e05db386559905b23cf6eb87/add-ons/install-dependencies/install-dependencies.py#L117). The path to the 
 Python binary is given by [`sys.executable`](https://developer.blender.org/rB04c5471ceefb41c9e49bf7c86f07e9e7b8426bb3). If you need to support Blender versions prior to 2.91.0, then you have to check [`bpy.app.version`](https://docs.blender.org/api/current/bpy.app.html#bpy.app.version) 
-and use `bpy.app.binary_path_python` in versions prior to 2.91.0. Once the installation has been attempted, the `PYTHONNOUSERSITE` environment variable is removed.
+and use `bpy.app.binary_path_python` in older versions of Blender. Once the installation has been attempted, the `PYTHONNOUSERSITE` environment variable is removed.
 
 ### Importing the module
 
