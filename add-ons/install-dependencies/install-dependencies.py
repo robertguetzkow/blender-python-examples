@@ -29,15 +29,16 @@ bl_info = {
 
 import bpy
 import os
+import sys
 import subprocess
 import importlib
 from collections import namedtuple
 
 Dependency = namedtuple("Dependency", ["module", "package", "name"])
 
-# Declare all modules that this add-on depends on. The package and (global) name can be set to None,
-# if they are equal to the module name. See import_module and ensure_and_import_module for the
-# explanation of the arguments.
+# Declare all modules that this add-on depends on, that may need to be installed. The package and (global) name can be
+# set to None, if they are equal to the module name. See import_module and ensure_and_import_module for the explanation
+# of the arguments.
 dependencies = (Dependency(module="matplotlib", package=None, name=None),)
 
 dependencies_installed = False
@@ -73,7 +74,7 @@ def install_pip():
 
     try:
         # Check if pip is already installed
-        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "--version"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "--version"], check=True)
     except subprocess.CalledProcessError:
         import ensurepip
 
