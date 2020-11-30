@@ -17,7 +17,7 @@
 bl_info = {
     "name": "Install Dependencies Example",
     "author": "Robert Guetzkow",
-    "version": (1, 0, 3),
+    "version": (1, 0, 4),
     "blender": (2, 81, 0),
     "location": "View3D > Sidebar > Example Tab",
     "description": "Example add-on that installs a Python package",
@@ -38,13 +38,14 @@ Dependency = namedtuple("Dependency", ["module", "package", "name"])
 
 # Declare all modules that this add-on depends on, that may need to be installed. The package and (global) name can be
 # set to None, if they are equal to the module name. See import_module and ensure_and_import_module for the explanation
-# of the arguments.
+# of the arguments. DO NOT use this to import other parts of your Python add-on, import them as usual with an
+# "import" statement.
 dependencies = (Dependency(module="matplotlib", package=None, name=None),)
 
 dependencies_installed = False
 
 
-def import_module(module_name, global_name=None):
+def import_module(module_name, global_name=None, reload=True):
     """
     Import a module.
     :param module_name: Module to import.
@@ -56,9 +57,12 @@ def import_module(module_name, global_name=None):
     if global_name is None:
         global_name = module_name
 
-    # Attempt to import the module and assign it to globals dictionary. This allow to access the module under
-    # the given name, just like the regular import would.
-    globals()[global_name] = importlib.import_module(module_name)
+    if global_name in globals():
+        importlib.reload(globals()[global_name])
+    else:
+        # Attempt to import the module and assign it to globals dictionary. This allow to access the module under
+        # the given name, just like the regular import would.
+        globals()[global_name] = importlib.import_module(module_name)
 
 
 def install_pip():
@@ -137,10 +141,12 @@ class EXAMPLE_PT_panel(bpy.types.Panel):
         layout = self.layout
 
         for dependency in dependencies:
-            if dependency.name is None:
+            if dependency.name is None and hasattr(globals()[dependency.module], "__version__"):
                 layout.label(text=f"{dependency.module} {globals()[dependency.module].__version__}")
-            else:
+            elif hasattr(globals()[dependency.name], "__version__"):
                 layout.label(text=f"{dependency.module} {globals()[dependency.name].__version__}")
+            else:
+                layout.label(text=f"{dependency.module}")
 
         layout.operator(EXAMPLE_OT_dummy_operator.bl_idname)
 
