@@ -84,7 +84,7 @@ The add-on was originally developed as an answer to the [this question](https://
 ### 1.0.4 - 2020-11-30
  **Compatible Blender versions:** 2.91
 
- **Commit hash:** [8bf7ddefb458e697d51ca5bd74185890146d4e9d](https://github.com/robertguetzkow/blender-python-examples/commit/8bf7ddefb458e697d51ca5bd74185890146d4e9d)
+ **Commit hash:** [c7ba15da33da9e83d83f8750a2fa0f22c1cc81b2](https://github.com/robertguetzkow/blender-python-examples/commit/c7ba15da33da9e83d83f8750a2fa0f22c1cc81b2)
 
  **Changes:**
  - Replace the [deprecated `bpy.app.binary_path_python`](https://developer.blender.org/rB04c5471ceefb41c9e49bf7c86f07e9e7b8426bb3) with `sys.executable`. For compatibility with version prior to 2.91.0 you would have to modify the code. Check [`bpy.app.version`](https://docs.blender.org/api/current/bpy.app.html#bpy.app.version) and select the appropriate way to get the path to the Python interpreter for that Blender version.
