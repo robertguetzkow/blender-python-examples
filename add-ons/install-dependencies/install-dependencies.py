@@ -106,17 +106,11 @@ def install_and_import_module(module_name, package_name=None, global_name=None):
     # site-packages. If the package is not already installed for Blender's Python interpreter, it will then try to.
     # The paths used by pip can be checked with `subprocess.run([bpy.app.binary_path_python, "-m", "site"], check=True)`
 
-    # Store the original environment variables
-    environ_orig = dict(os.environ)
-    os.environ["PYTHONNOUSERSITE"] = "1"
+    # Create a copy of the environment variables and modify them for the subprocess call
+    environ_copy = dict(os.environ)
+    environ_copy["PYTHONNOUSERSITE"] = "1"
 
-    try:
-        # Try to install the package. This may fail with subprocess.CalledProcessError
-        subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True)
-    finally:
-        # Always restore the original environment variables
-        os.environ.clear()
-        os.environ.update(environ_orig)
+    subprocess.run([bpy.app.binary_path_python, "-m", "pip", "install", package_name], check=True, env=environ_copy)
 
     # The installation succeeded, attempt to import the module again
     import_module(module_name, global_name)
