@@ -12,4 +12,4 @@ All code is licensed under [GNU General Public License 3](./LICENSE). The conten
 ## Table of Contents
 
 ### Add-ons
-- [Install Dependencies](./add-ons/install-dependencies) - How to install Python packages with pip in Blender
+- [Install Dependencies](./add_ons/install_dependencies) - How to install Python packages with pip in Blender
