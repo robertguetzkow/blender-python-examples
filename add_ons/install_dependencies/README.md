@@ -1,5 +1,13 @@
 # Install dependencies
 
+> [!NOTE] 
+> Blender 4.2 will introduce the Blender Extension Platform. Extensions allow to properly manage dependencies through a manifest. The approach shown in this repository is only a workaround for Blender versions before 4.2 and should no longer be used in the future.
+> 
+> For more details see:
+> - https://extensions.blender.org/about/
+> - https://docs.blender.org/manual/en/dev/extensions/index.html#extensions-index
+> - https://docs.blender.org/manual/en/dev/extensions/addons.html#bundle-dependencies
+
 ## Description
 
 This add-on demonstrates how to install Python packages from within Blender. Elevated privileges may be required, depending on the permissions set on Blender's directory.
